@@ -5,64 +5,60 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiledSharp;
 
 namespace EssaiZelda
 {
     class Map
     {
-        public int MAP_HEIGHT = 700;
-        public int MAP_WIDTH = 700;
-        public int TILE_HEIGHT = 70;
-        public int TILE_WIDTH = 70;
+        public int MAP_HEIGHT = 23*32; // Nombre de Tiles * Taille des Tiles.
+        public int MAP_WIDTH = 32*32; // Nombre de Tiles * Taille des Tiles.
 
-        public Texture2D grassCenter;
-        public Texture2D liquidLava;
-        public Texture2D liquidWater;
-        public Texture2D snowCenter;
-        public Texture2D stoneCenter;
+        TmxMap map = new TmxMap("Map/mapTiled.tmx");
+        public Texture2D tileset;
 
+        int tileWidth; // Valeur Récupéré grace a TMXMAP
+        int tileHeight; // Valeur Récupéré grace a TMXMAP
+        int tilesetTilesWide;
+        int tilesetTilesHigh;
 
-        int[,] Carte = {
-            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 3, 1, 1, 1 },
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
-            { 1, 5, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 4, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-        };
-
-        public Texture2D[] TileTextures = new Texture2D[6]; // On défini un Tableau de Texture2D de taille 6 élements [0-5]
-        
         public void Load()
         {
             System.Diagnostics.Debug.WriteLine("Début d'affectation des Tiles...");
-            TileTextures[0] = null;
-            TileTextures[1] = grassCenter;
-            TileTextures[2] = liquidLava;
-            TileTextures[3] = liquidWater;
-            TileTextures[4] = snowCenter;
-            TileTextures[5] = stoneCenter;
+            var version = map.Version;
+            var myTileset = map.Tilesets["tilesheet"];
+            var myLayer = map.Layers[0];
+            System.Diagnostics.Debug.WriteLine("Récupérations des tailles des Tile...");
+            tileWidth = map.Tilesets[0].TileWidth;
+            tileHeight = map.Tilesets[0].TileHeight;
+            System.Diagnostics.Debug.WriteLine("Récupérations des tailles HD des Tile...");
+            tilesetTilesWide = tileset.Width / tileWidth;
+            tilesetTilesHigh = tileset.Height / tileHeight;
             System.Diagnostics.Debug.WriteLine("Début d'affectation des Tiles terminées...");
 
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            int c, l, id;
-            for (l=0; l< 10; l++) // Notre carte possede 10 Lignes
+            for (var i = 0; i < map.Layers[0].Tiles.Count; i++) //on compte le nombre de Tiles est nécessaire pour faire la map.
             {
-                for (c = 0; c < 10; c++) // Et également 10 Colonnes
+                int gid = map.Layers[0].Tiles[i].Gid; // On récupere l'id de la Tile.
+                if (gid == 0)
                 {
-                    id = Carte[l,c]; //recupere le numéro de la tile
-                    spriteBatch.Begin();
-                    int x = c * TILE_WIDTH; //Position X de la tile
-                    int y = l * TILE_HEIGHT; //Position Y de la tile
-                    spriteBatch.Draw(TileTextures[id], new Rectangle(x, y, TILE_HEIGHT, TILE_WIDTH), Color.White); // On déssine la tile a X et Y d'une longeur TILE_HEIGHT & TILE_WIDTH
-                    spriteBatch.End();
+                    //Si l'id de la tile est 0 alors on affiche un "trou"
+                }
+                else
+                {
+                    int tileFrame = gid - 1;
+                    int column = tileFrame % tilesetTilesWide;
+                    int row = (int)Math.Floor((double)tileFrame / (double)tilesetTilesWide);
+
+                    float x = (i % map.Width) * map.TileWidth; // On calcule les coordonnées de positionnement de la tile
+                    float y = (float)Math.Floor(i / (double)map.Width) * map.TileHeight; // On calcule les coordonnées de positionnement de la tile
+
+                    Rectangle tilesetRec = new Rectangle(tileWidth * column, tileHeight * row, tileWidth, tileHeight); // On récupere la Tile d'origine
+
+                    spriteBatch.Draw(tileset, new Rectangle((int)x, (int)y, tileWidth, tileHeight), tilesetRec, Color.White); // On dessine la Tile
                 }
             }
         }

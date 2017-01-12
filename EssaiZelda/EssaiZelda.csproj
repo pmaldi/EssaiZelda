@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="Game1.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -51,7 +52,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="TiledSharp">
-      <HintPath>C:\Users\Patrice\Source\Repos\TiledSharp\TiledSharp\bin\Debug\TiledSharp.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\TiledSharp-master\TiledSharp\bin\Debug\TiledSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -6,21 +6,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiledSharp;
+using Microsoft.Xna.Framework.Input;
 
 namespace EssaiZelda
 {
     class Map
     {
+        Player Hero = new Player();
         public int MAP_HEIGHT = 23*32; // Nombre de Tiles * Taille des Tiles.
         public int MAP_WIDTH = 32*32; // Nombre de Tiles * Taille des Tiles.
 
         TmxMap map = new TmxMap("Map/mapTiled.tmx");
         public Texture2D tileset;
 
-        int tileWidth; // Valeur Récupéré grace a TMXMAP
-        int tileHeight; // Valeur Récupéré grace a TMXMAP
-        int tilesetTilesWide;
-        int tilesetTilesHigh;
+        public int tileWidth; // Valeur Récupéré grace a TMXMAP
+        public int tileHeight; // Valeur Récupéré grace a TMXMAP
+        public int tilesetTilesWide;
+        public int tilesetTilesHigh;
 
         public void Load()
         {
@@ -35,7 +37,6 @@ namespace EssaiZelda
             tilesetTilesWide = tileset.Width / tileWidth;
             tilesetTilesHigh = tileset.Height / tileHeight;
             System.Diagnostics.Debug.WriteLine("Début d'affectation des Tiles terminées...");
-
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -61,6 +62,24 @@ namespace EssaiZelda
                     spriteBatch.Draw(tileset, new Rectangle((int)x, (int)y, tileWidth, tileHeight), tilesetRec, Color.White); // On dessine la Tile
                 }
             }
+        }
+
+        public string Information()
+        {
+            int X = Mouse.GetState().X;
+            int Y = Mouse.GetState().Y;
+            int col = (Convert.ToInt32(X) / tileWidth) +1;
+            int lig = (Convert.ToInt32(Y) / tileHeight)+1;
+            if (col > 0 && col < MAP_WIDTH && lig > 0 && lig < MAP_HEIGHT)
+            {
+                int id = map.Layers[0].Tiles[0].Gid;
+                return id.ToString();
+            }
+            else
+            {
+                return "KO";
+            }
+
         }
     }
 }

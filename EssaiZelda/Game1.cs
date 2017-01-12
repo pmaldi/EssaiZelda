@@ -9,6 +9,7 @@ namespace EssaiZelda
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Map MaMap = new Map();
+        Player Hero = new Player();
 
         public Game1()
         {
@@ -33,7 +34,13 @@ namespace EssaiZelda
             MaMap.tileset = Content.Load<Texture2D>("images/tilesheet");
             MaMap.Load();
             System.Diagnostics.Debug.WriteLine("Début de chargement des textures terminées...");
-
+            System.Diagnostics.Debug.WriteLine("Début de chargement du Hero...");
+            Hero.Player_1 = Content.Load<Texture2D>("images/player/player_1");
+            Hero.Player_2 = Content.Load<Texture2D>("images/player/player_2");
+            Hero.Player_3 = Content.Load<Texture2D>("images/player/player_3");
+            Hero.Player_4 = Content.Load<Texture2D>("images/player/player_4");
+            Hero.Load();
+            System.Diagnostics.Debug.WriteLine("Début de chargement du Hero terminés...");
         }
 
         protected override void UnloadContent()
@@ -47,7 +54,8 @@ namespace EssaiZelda
                 Exit();
 
             // TODO: Add your update logic here
-
+            Window.Title = "ID : " + MaMap.Information();
+            Hero.Update(MaMap,gameTime);
             base.Update(gameTime);
         }
 
@@ -56,6 +64,7 @@ namespace EssaiZelda
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
             MaMap.Draw(gameTime, spriteBatch); // On Appel la fonction Draw de la Class Map
+            Hero.Draw(MaMap,gameTime,spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }

@@ -16,7 +16,7 @@ namespace EssaiZelda
         public int MAP_HEIGHT = 23 * 32; // Nombre de Tiles * Taille des Tiles.
         public int MAP_WIDTH = 32 * 32; // Nombre de Tiles * Taille des Tiles.
 
-        TmxMap map = new TmxMap("Map/mapTiled.tmx");
+        TmxMap map = new TmxMap("Map/ZeldaTest.tmx");
         public Texture2D tileset;
 
         public int tileWidth; // Valeur Récupéré grace a TMXMAP
@@ -25,13 +25,13 @@ namespace EssaiZelda
         public int tilesetTilesHigh;
 
         public int[,] Tiles;
-        public string[] TilesTypes = new string[170];
+        public string[] TilesTypes = new string[1180];
 
         public void Load()
         {
             System.Diagnostics.Debug.WriteLine("Début d'affectation des Tiles...");
             var version = map.Version;
-            var myTileset = map.Tilesets["tilesheet"];
+            var myTileset = map.Tilesets["Zelda"];
             var myLayer = map.Layers[0];
             System.Diagnostics.Debug.WriteLine("Récupérations des tailles des Tile...");
             tileWidth = map.Tilesets[0].TileWidth;
@@ -71,25 +71,13 @@ namespace EssaiZelda
         public void setTileCoord()
         {
             Tiles = new int[32, 23]; //on crée un tableau correspondant au nombre de Tiles
-            for (var i = 0; i < map.Layers[0].Tiles.Count; i++) //on compte le nombre de Tiles
+            for (var i = 0; i < map.Layers[1].Tiles.Count; i++) //on compte le nombre de Tiles
             {
-                Tiles[map.Layers[0].Tiles[i].X, map.Layers[0].Tiles[i].Y] = map.Layers[0].Tiles[i].Gid; // on attribue au coordonnée X/Y l'id de la tile
+                Tiles[map.Layers[1].Tiles[i].X, map.Layers[1].Tiles[i].Y] = map.Layers[1].Tiles[i].Gid; // on attribue au coordonnée X/Y l'id de la tile
             }
-            TilesTypes[10] = "Grass"; // Type de Tile
-            TilesTypes[11] = "Grass";
-            TilesTypes[13] = "Sand";
-            TilesTypes[14] = "Sand";
-            TilesTypes[15] = "Sand";
-            TilesTypes[19] = "Water";
-            TilesTypes[20] = "Water";
-            TilesTypes[21] = "Sea";
-            TilesTypes[37] = "Lava";
-            TilesTypes[55] = "Tree";
-            TilesTypes[58] = "Tree";
-            TilesTypes[61] = "Tree";
-            TilesTypes[68] = "Tree";
-            TilesTypes[129] = "Rock";
-            TilesTypes[169] = "Rock";
+            TilesTypes[0] = "Walk";
+            TilesTypes[1179] = "Interdit";
+
             System.Diagnostics.Debug.WriteLine("Alimentation du Tableau Tiles.. Function setTileCoord..");
 
         }
@@ -102,7 +90,8 @@ namespace EssaiZelda
             int lig = (Convert.ToInt32(Y) / tileHeight);
             if (col >= 0 && col < (MAP_WIDTH / tileWidth) && lig >= 0 && lig < (MAP_HEIGHT / tileHeight))
             {
-                return TilesTypes[Tiles[col, lig]] +" ||| X : "+col+" ||| Y : "+lig;
+                //return TilesTypes[Tiles[col, lig]] +" ||| X : "+col+" ||| Y : "+lig;
+                return Tiles[col, lig] +" ||| X : "+col+" ||| Y : "+lig;
             }
             else
             {
@@ -112,11 +101,11 @@ namespace EssaiZelda
 
         public bool isSolid(string LaTile) // Fonction qui permet de définir et verifier les Tiles Solides.
         {
-            if (LaTile == "Sea" || LaTile == "Tree" || LaTile == "Rock")
+            if (LaTile == "Walk")
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
     }
 }

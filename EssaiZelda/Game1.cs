@@ -31,14 +31,18 @@ namespace EssaiZelda
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             System.Diagnostics.Debug.WriteLine("Début de chargement des textures...");
-            MaMap.tileset = Content.Load<Texture2D>("images/tilesheet");
+            MaMap.tileset = Content.Load<Texture2D>("images/tilesheet_Zelda");
             MaMap.Load();
             System.Diagnostics.Debug.WriteLine("Début de chargement des textures terminées...");
             System.Diagnostics.Debug.WriteLine("Début de chargement du Hero...");
-            Hero.Player_1 = Content.Load<Texture2D>("images/player/player_1");
-            Hero.Player_2 = Content.Load<Texture2D>("images/player/player_2");
-            Hero.Player_3 = Content.Load<Texture2D>("images/player/player_3");
-            Hero.Player_4 = Content.Load<Texture2D>("images/player/player_4");
+            for (var i = 1; i <= 6; i++)
+            {
+                Hero.PlayerUp[i-1] = Content.Load<Texture2D>("images/player/up/Up"+i);
+                Hero.PlayerDown[i-1] = Content.Load<Texture2D>("images/player/down/Down"+i);
+                Hero.PlayerLeft[i-1] = Content.Load<Texture2D>("images/player/left/Left"+i);
+                Hero.PlayerRight[i-1] = Content.Load<Texture2D>("images/player/right/Right"+i);
+            }
+
             Hero.Load();
             System.Diagnostics.Debug.WriteLine("Début de chargement du Hero terminés...");
         }

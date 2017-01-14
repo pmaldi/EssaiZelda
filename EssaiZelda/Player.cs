@@ -46,6 +46,9 @@ namespace EssaiZelda
                 
                 if(KeyPressed == false){
 
+                    int oldPlayerColumn = PlayerColumn;
+                    int oldPlayerLine = PlayerLine;
+
                     if (Keyboard.GetState().IsKeyDown(Keys.Up) && PlayerLine > 1)
                     {
                         PlayerLine = PlayerLine - 1;
@@ -61,6 +64,15 @@ namespace EssaiZelda
                     if (Keyboard.GetState().IsKeyDown(Keys.Left) && PlayerColumn > 1)
                     {
                         PlayerColumn = PlayerColumn - 1;
+                    }
+
+                    string SolDuPlayer = pMap.TilesTypes[pMap.Tiles[PlayerColumn-1, PlayerLine-1]];
+                    if (pMap.isSolid(SolDuPlayer))
+                    {
+                        System.Diagnostics.Debug.WriteLine(SolDuPlayer);
+                        System.Diagnostics.Debug.WriteLine("Impossible... isSolid");
+                        PlayerColumn = oldPlayerColumn;
+                        PlayerLine = oldPlayerLine;
                     }
                     KeyPressed = true;
                 }

@@ -9,7 +9,11 @@ namespace EssaiZelda
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Map MaMap = new Map();
+        Boutique MaBoutique = new Boutique();
         Player Hero = new Player();
+
+        enum GameState { MapPrincipal, MapBoutique}
+        GameState currentState = GameState.MapBoutique;
 
         public Game1()
         {
@@ -33,6 +37,8 @@ namespace EssaiZelda
             System.Diagnostics.Debug.WriteLine("Début de chargement des textures...");
             MaMap.tileset = Content.Load<Texture2D>("images/tilesheet_Zelda");
             MaMap.Load();
+            MaBoutique.tileset = Content.Load<Texture2D>("images/shop");
+            MaBoutique.Load();
             System.Diagnostics.Debug.WriteLine("Début de chargement des textures terminées...");
             System.Diagnostics.Debug.WriteLine("Début de chargement du Hero...");
             for (var i = 1; i <= 6; i++)
@@ -54,22 +60,47 @@ namespace EssaiZelda
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
+            switch (currentState)
+            {
+                case GameState.MapPrincipal:
+                    {
+                        Window.Title = "ID : " + MaMap.Information();
+                        if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+                            currentState = GameState.MapBoutique;
+                    }
+                break;
+                case GameState.MapBoutique:
+                    {
+                        Window.Title = "ID : " + MaMap.Information();
+                        if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+                            currentState = GameState.MapPrincipal;
+                    }
+                    break;
+            }
             // TODO: Add your update logic here
-            Window.Title = "ID : " + MaMap.Information();
             Hero.Update(MaMap,gameTime);
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-            spriteBatch.Begin();
-            MaMap.Draw(gameTime, spriteBatch); // On Appel la fonction Draw de la Class Map
-            Hero.Draw(MaMap,gameTime,spriteBatch);
-            spriteBatch.End();
+
+            if(currentState == GameState.MapPrincipal)
+            {
+                GraphicsDevice.Clear(Color.Black);
+                spriteBatch.Begin();
+                MaMap.Draw(gameTime, spriteBatch); // On Appel la fonction Draw de la Class Map
+                Hero.Draw(MaMap, gameTime, spriteBatch);
+                spriteBatch.End();
+            }
+            if(currentState == GameState.MapBoutique)
+            {
+                GraphicsDevice.Clear(Color.Black);
+                spriteBatch.Begin();
+                MaBoutique.Draw(gameTime, spriteBatch); // On Appel la fonction Draw de la Class Map
+                Hero.Draw(MaMap, gameTime, spriteBatch);
+                spriteBatch.End();
+            }
             base.Draw(gameTime);
         }
     }

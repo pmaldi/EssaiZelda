@@ -6,19 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static EssaiZelda.Game1;
 
 namespace EssaiZelda
 {
     class Player
     {
+        public GameState currentState;
         public Texture2D[] PlayerUp = new Texture2D[6]; // Ensemble d'images
         public Texture2D[] PlayerDown = new Texture2D[6]; // Ensemble d'images
         public Texture2D[] PlayerRight = new Texture2D[6]; // Ensemble d'images
         public Texture2D[] PlayerLeft = new Texture2D[6]; // Ensemble d'images
-        Texture2D ImageAffiche; // Me permet de recupéré la Texture2D quand on press une touche directionnel et surtout permet de l'afficher dans le SpriteBatch
+        public Texture2D ImageAffiche; // Me permet de recupéré la Texture2D quand on press une touche directionnel et surtout permet de l'afficher dans le SpriteBatch
         double imageCurrent; // Curseur de position de l'image
-        int PlayerLine; // La ligne sur laquelle ce trouve le Player
-        int PlayerColumn; // La colonne cette fois
+        public int PlayerLine; // La ligne sur laquelle ce trouve le Player
+        public int PlayerColumn; // La colonne cette fois
         bool KeyPressed = false; // Boolean qui bloque la répétition de touche
 
         public void Load()
@@ -29,7 +31,7 @@ namespace EssaiZelda
             PlayerColumn = 3; // Colonne de départ du Player (Attention, ajoute +1 car -1 dans les calculs)
         }
 
-        public void Update(Map pMap, GameTime gameTime)
+        public void Update(Map pMap,Map bMap, GameTime gameTime, SpriteBatch spriteBatch)
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Up) || (Keyboard.GetState().IsKeyDown(Keys.Right) || (Keyboard.GetState().IsKeyDown(Keys.Down) || (Keyboard.GetState().IsKeyDown(Keys.Left))))){
                 
@@ -57,15 +59,30 @@ namespace EssaiZelda
                         PlayerColumn = PlayerColumn - 1;
                         ImageAffiche = Animation(gameTime, PlayerLeft); // Fonction qui permet de récupéré la texture a affiché
                     }
-
-                    string SolDuPlayer = pMap.TilesTypes[pMap.Tiles[PlayerColumn-1, PlayerLine-1]]; // On regarde sous nos pied le type de Tile
-                    if (pMap.isSolid(SolDuPlayer)) // Si la tile est Interdite on revient a la position précédente
+                    if(currentState == GameState.MapPrincipal)
                     {
-                        System.Diagnostics.Debug.WriteLine(SolDuPlayer); // "Interdit / "Walk"
-                        System.Diagnostics.Debug.WriteLine("Impossible... isSolid");
-                        PlayerColumn = oldPlayerColumn; 
-                        PlayerLine = oldPlayerLine;
+                        string SolDuPlayer = pMap.TilesTypes[pMap.TilespMap[PlayerColumn - 1, PlayerLine - 1]]; // On regarde sous nos pied le type de Tile
+                        System.Diagnostics.Debug.WriteLine((PlayerColumn - 1).ToString() +":"+ (PlayerLine - 1).ToString());
+                        if (pMap.isSolid(SolDuPlayer, bMap, gameTime, spriteBatch)) // Si la tile est Interdite on revient a la position précédente
+                        {
+                            System.Diagnostics.Debug.WriteLine(SolDuPlayer); // "Interdit / "Walk"
+                            System.Diagnostics.Debug.WriteLine("Impossible... isSolid");
+                            PlayerColumn = oldPlayerColumn;
+                            PlayerLine = oldPlayerLine;
+                        }
                     }
+                    if (currentState == GameState.MapBoutique)
+                    {
+                        string SolDuPlayer = bMap.TilesTypes[bMap.TilesbMap[PlayerColumn - 1, PlayerLine - 1]]; // On regarde sous nos pied le type de Tile
+                        if (bMap.isSolid(SolDuPlayer,bMap,gameTime,spriteBatch)) // Si la tile est Interdite on revient a la position précédente
+                        {
+                            System.Diagnostics.Debug.WriteLine(SolDuPlayer); // "Interdit / "Walk"
+                            System.Diagnostics.Debug.WriteLine("Impossible... isSolid");
+                            PlayerColumn = oldPlayerColumn;
+                            PlayerLine = oldPlayerLine;
+                        }
+                    }
+
                     KeyPressed = true;
                 }
             }else{
@@ -73,11 +90,21 @@ namespace EssaiZelda
             }
         }
 
-        public void Draw(Map pMap, GameTime gameTime, SpriteBatch spriteBatch)
+        public void Draw(Map pMap, GameTime gameTime, int pX, int pY, SpriteBatch spriteBatch)
         {
+            PlayerColumn = pX;
+            PlayerLine = pY;
             int x = (PlayerColumn - 1) * pMap.tileWidth;
             int y = (PlayerLine - 1) * pMap.tileHeight;
-            spriteBatch.Draw(ImageAffiche, new Rectangle((int)x, (int)y, 32, 32), Color.White); // On dessine notre Joueur
+            if(ImageAffiche == null)
+            {
+                ImageAffiche = PlayerUp[1]; 
+                spriteBatch.Draw(ImageAffiche, new Rectangle((int)x, (int)y, 32, 32), Color.White); // On dessine notre Joueur
+            }
+            else
+            {
+                spriteBatch.Draw(ImageAffiche, new Rectangle((int)x, (int)y, 32, 32), Color.White); // On dessine notre Joueur
+            }
         }
 
         public Texture2D Animation(GameTime gameTime, Texture2D[] Images)

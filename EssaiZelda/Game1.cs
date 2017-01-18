@@ -12,8 +12,8 @@ namespace EssaiZelda
         Boutique MaBoutique = new Boutique();
         Player Hero = new Player();
 
-        enum GameState { MapPrincipal, MapBoutique}
-        GameState currentState = GameState.MapBoutique;
+        public enum GameState { MapPrincipal, MapBoutique}
+        public GameState currentState = GameState.MapPrincipal;
 
         public Game1()
         {
@@ -60,25 +60,34 @@ namespace EssaiZelda
 
         protected override void Update(GameTime gameTime)
         {
+            Hero.currentState = currentState;
             switch (currentState)
             {
                 case GameState.MapPrincipal:
                     {
-                        Window.Title = "ID : " + MaMap.Information();
+                        Window.Title = "ID : " + MaMap.Information(currentState);
                         if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+                        {
                             currentState = GameState.MapBoutique;
+                            Hero.currentState = GameState.MapBoutique;
+                            MaMap.currentState = GameState.MapBoutique;
+                        }
                     }
                 break;
                 case GameState.MapBoutique:
                     {
-                        Window.Title = "ID : " + MaMap.Information();
+                        Window.Title = "ID : " + MaBoutique.Information(currentState);
                         if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+                        {
                             currentState = GameState.MapPrincipal;
+                            Hero.currentState = GameState.MapPrincipal;
+                            MaMap.currentState = GameState.MapPrincipal;
+                        }
                     }
                     break;
             }
             // TODO: Add your update logic here
-            Hero.Update(MaMap,gameTime);
+            Hero.Update(MaMap, MaBoutique, gameTime, spriteBatch);
             base.Update(gameTime);
         }
 
@@ -90,7 +99,7 @@ namespace EssaiZelda
                 GraphicsDevice.Clear(Color.Black);
                 spriteBatch.Begin();
                 MaMap.Draw(gameTime, spriteBatch); // On Appel la fonction Draw de la Class Map
-                Hero.Draw(MaMap, gameTime, spriteBatch);
+                Hero.Draw(MaMap, gameTime,Hero.PlayerColumn,Hero.PlayerLine, spriteBatch);
                 spriteBatch.End();
             }
             if(currentState == GameState.MapBoutique)
@@ -98,7 +107,7 @@ namespace EssaiZelda
                 GraphicsDevice.Clear(Color.Black);
                 spriteBatch.Begin();
                 MaBoutique.Draw(gameTime, spriteBatch); // On Appel la fonction Draw de la Class Map
-                Hero.Draw(MaMap, gameTime, spriteBatch);
+                Hero.Draw(MaBoutique, gameTime, Hero.PlayerColumn, Hero.PlayerLine, spriteBatch);
                 spriteBatch.End();
             }
             base.Draw(gameTime);

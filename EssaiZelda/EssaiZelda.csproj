@@ -63,6 +63,9 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Map\mapTiled.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Map\Shop.tmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

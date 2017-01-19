@@ -1,13 +1,31 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using TiledSharp;
+using Microsoft.Xna.Framework.Input;
 
 namespace EssaiZelda
 {
-    class Boutique : Map
+    class Boutique
     {
-        public TmxMap shop = new TmxMap("Map/Shop.tmx");
+        Player Hero = new Player();
+        public int MAP_HEIGHT = 23 * 32; // Nombre de Tiles * Taille des Tiles.
+        public int MAP_WIDTH = 32 * 32; // Nombre de Tiles * Taille des Tiles.
+
+        TmxMap shop = new TmxMap("Map/Shop.tmx");
+        public Texture2D tileset;
+
+        public int tileWidth; // Valeur Récupéré grace a TMXMAP
+        public int tileHeight; // Valeur Récupéré grace a TMXMAP
+        public int tilesetTilesWide;
+        public int tilesetTilesHigh;
+
+        public int[,] Tiles;
+        public string[] TilesTypes = new string[1180];
 
         public void Load()
         {
@@ -22,7 +40,7 @@ namespace EssaiZelda
             tilesetTilesWide = tileset.Width / tileWidth;
             tilesetTilesHigh = tileset.Height / tileHeight;
             System.Diagnostics.Debug.WriteLine("Début d'affectation des Tiles terminées...");
-            setTileCoord(shop);
+            setTileCoord();
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -48,6 +66,46 @@ namespace EssaiZelda
                     spriteBatch.Draw(tileset, new Rectangle((int)x, (int)y, tileWidth, tileHeight), tilesetRec, Color.White); // On dessine la Tile
                 }
             }
+        }
+
+        public void setTileCoord()
+        {
+            Tiles = new int[32, 23]; //on crée un tableau correspondant au nombre de Tiles
+            for (var i = 0; i < shop.Layers[1].Tiles.Count; i++) //on compte le nombre de Tiles
+            {
+                Tiles[shop.Layers[1].Tiles[i].X, shop.Layers[1].Tiles[i].Y] = shop.Layers[1].Tiles[i].Gid; // on attribue au coordonnée X/Y l'id de la tile
+            }
+            TilesTypes[0] = "Walk";
+            TilesTypes[188] = "Interdit";
+
+            System.Diagnostics.Debug.WriteLine("Alimentation du Tableau Tiles.. Function setTileCoord..");
+
+        }
+
+        public string Information() // Fonction d'aide pour avoir des infos (ID, X,Y)
+        {
+            int X = Mouse.GetState().X;
+            int Y = Mouse.GetState().Y;
+            int col = (Convert.ToInt32(X) / tileWidth);
+            int lig = (Convert.ToInt32(Y) / tileHeight);
+            if (col >= 0 && col < (MAP_WIDTH / tileWidth) && lig >= 0 && lig < (MAP_HEIGHT / tileHeight))
+            {
+                //return TilesTypes[Tiles[col, lig]] +" ||| X : "+col+" ||| Y : "+lig;
+                return Tiles[col, lig] +" ||| X : "+col+" ||| Y : "+lig;
+            }
+            else
+            {
+                return "KO";
+            }
+        }
+
+        public bool isSolid(string LaTile) // Fonction qui permet de définir et verifier les Tiles Solides.
+        {
+            if (LaTile == "Walk")
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

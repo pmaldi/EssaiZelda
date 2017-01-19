@@ -9,7 +9,11 @@ namespace EssaiZelda
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Map MaMap = new Map();
+        Boutique MaBoutique = new Boutique();
         Player Hero = new Player();
+
+        public enum GameState { MapPrincipal, MapBoutique}
+        public GameState currentState = GameState.MapPrincipal;
 
         public Game1()
         {
@@ -31,14 +35,20 @@ namespace EssaiZelda
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             System.Diagnostics.Debug.WriteLine("Début de chargement des textures...");
-            MaMap.tileset = Content.Load<Texture2D>("images/tilesheet");
+            MaMap.tileset = Content.Load<Texture2D>("images/tilesheet_Zelda");
             MaMap.Load();
+            MaBoutique.tileset = Content.Load<Texture2D>("images/shop");
+            MaBoutique.Load();
             System.Diagnostics.Debug.WriteLine("Début de chargement des textures terminées...");
             System.Diagnostics.Debug.WriteLine("Début de chargement du Hero...");
-            Hero.Player_1 = Content.Load<Texture2D>("images/player/player_1");
-            Hero.Player_2 = Content.Load<Texture2D>("images/player/player_2");
-            Hero.Player_3 = Content.Load<Texture2D>("images/player/player_3");
-            Hero.Player_4 = Content.Load<Texture2D>("images/player/player_4");
+            for (var i = 1; i <= 6; i++)
+            {
+                Hero.PlayerUp[i-1] = Content.Load<Texture2D>("images/player/up/Up"+i);
+                Hero.PlayerDown[i-1] = Content.Load<Texture2D>("images/player/down/Down"+i);
+                Hero.PlayerLeft[i-1] = Content.Load<Texture2D>("images/player/left/Left"+i);
+                Hero.PlayerRight[i-1] = Content.Load<Texture2D>("images/player/right/Right"+i);
+            }
+
             Hero.Load();
             System.Diagnostics.Debug.WriteLine("Début de chargement du Hero terminés...");
         }
@@ -50,22 +60,56 @@ namespace EssaiZelda
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
+            Hero.currentState = currentState;
+            switch (currentState)
+            {
+                case GameState.MapPrincipal:
+                    {
+                        Window.Title = "ID : " + MaMap.Information(currentState);
+                        if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+                        {
+                            currentState = GameState.MapBoutique;
+                            Hero.currentState = GameState.MapBoutique;
+                            MaMap.currentState = GameState.MapBoutique;
+                        }
+                    }
+                break;
+                case GameState.MapBoutique:
+                    {
+                        Window.Title = "ID : " + MaBoutique.Information(currentState);
+                        if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+                        {
+                            currentState = GameState.MapPrincipal;
+                            Hero.currentState = GameState.MapPrincipal;
+                            MaMap.currentState = GameState.MapPrincipal;
+                        }
+                    }
+                    break;
+            }
             // TODO: Add your update logic here
-            Window.Title = "ID : " + MaMap.Information();
-            Hero.Update(MaMap,gameTime);
+            Hero.Update(MaMap, MaBoutique, gameTime, spriteBatch);
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-            spriteBatch.Begin();
-            MaMap.Draw(gameTime, spriteBatch); // On Appel la fonction Draw de la Class Map
-            Hero.Draw(MaMap,gameTime,spriteBatch);
-            spriteBatch.End();
+
+            if(currentState == GameState.MapPrincipal)
+            {
+                GraphicsDevice.Clear(Color.Black);
+                spriteBatch.Begin();
+                MaMap.Draw(gameTime, spriteBatch); // On Appel la fonction Draw de la Class Map
+                Hero.Draw(MaMap, gameTime,Hero.PlayerColumn,Hero.PlayerLine, spriteBatch);
+                spriteBatch.End();
+            }
+            if(currentState == GameState.MapBoutique)
+            {
+                GraphicsDevice.Clear(Color.Black);
+                spriteBatch.Begin();
+                MaBoutique.Draw(gameTime, spriteBatch); // On Appel la fonction Draw de la Class Map
+                Hero.Draw(MaBoutique, gameTime, Hero.PlayerColumn, Hero.PlayerLine, spriteBatch);
+                spriteBatch.End();
+            }
             base.Draw(gameTime);
         }
     }
